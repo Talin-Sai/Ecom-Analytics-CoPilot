@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: monthly_sales
+    description: "Monthly sales aggregated from Olist order items joined to orders"
+    columns:
+      - name: month
+        tests:
+          - not_null
+      - name: sales
+        tests:
+          - not_null
