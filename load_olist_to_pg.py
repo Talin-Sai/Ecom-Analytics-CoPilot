@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 PG_USER = "ecom"
 PG_PASS = "ecompass"
 PG_DB   = "ecom_db"
-PG_HOST = "localhost"     # from YOUR laptop to the container
+PG_HOST = "localhost"     
 PG_PORT = "5432"
 
 DATA_DIR = Path("data/olist")  # folder with your CSVs
