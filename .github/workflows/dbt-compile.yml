@@ -1,0 +1,56 @@
+name: dbt compile (CI)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Show repo layout (root)
+        run: |
+          pwd
+          ls -la
+          echo "--- find (top-level) ---"
+          find . -maxdepth 2 -type d -print | sort
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Show dbt project layout
+        run: |
+          echo "--- ecom_dbt layout ---"
+          ls -la ecom_dbt || true
+          echo "--- models under ecom_dbt/models ---"
+          find ecom_dbt/models -maxdepth 3 -type f -print || true
+
+      - name: dbt deps
+        working-directory: ecom_dbt
+        run: |
+          dbt --version
+          dbt deps --no-use-colors -q
+
+      - name: dbt compile
+        working-directory: ecom_dbt
+        env:
+          DBT_PROFILES_DIR: ${{ github.workspace }}/ecom_dbt  # compile doesn't need a real connection
+        run: |
+          dbt compile --no-use-colors -q
+          echo "--- compile outputs ---"
+          ls -la target || true
+          test -f target/manifest.json && echo "manifest.json present" || echo "manifest.json missing"
+
+
